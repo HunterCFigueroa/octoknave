@@ -9,7 +9,7 @@ export default class Knave2eItemSheet extends ItemSheet {
   }
 
   get template() {
-    const path = "systems/knave2e/templates/item";
+    const path = "systems/octoknave/templates/item";
     let specificPath = `${path}/item-${this.item.type}-sheet.hbs`;
 
     return specificPath;

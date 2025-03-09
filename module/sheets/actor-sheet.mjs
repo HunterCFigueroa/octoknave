@@ -21,7 +21,7 @@ export default class Knave2eActorSheet extends ActorSheet {
   }
 
   get template() {
-    return `systems/knave2e/templates/actor/actor-${this.actor.type}-sheet.hbs`;
+    return `systems/octoknave/templates/actor/actor-${this.actor.type}-sheet.hbs`;
   }
 
   async getData() {
