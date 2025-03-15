@@ -69,6 +69,18 @@ export default class Knave2eCharacter extends Knave2eActorType {
       value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
       max: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
     });
+    
+    // New Stamina system
+    schema.stamina = new fields.SchemaField({
+      value: new fields.NumberField({ ...requiredInteger, initial: 10, min: 0 }),
+      max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 0 }),
+      progress: new fields.NumberField({
+        ...requiredInteger,
+        initial: 100,
+        min: 0,
+      }),
+    });
+    
     schema.wounds = new fields.SchemaField({
       value: new fields.NumberField({
         ...requiredInteger,
@@ -82,6 +94,19 @@ export default class Knave2eCharacter extends Knave2eActorType {
         min: 0,
       }),
     });
+    
+    // New XP tick system
+    schema.xpTicks = new fields.SchemaField({
+      ticks: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0, max: 10 }),
+      progress: new fields.NumberField({
+        ...requiredInteger,
+        initial: 0,
+        min: 0,
+        max: 100,
+      }),
+    });
+    
+    // Keep old xp for compatibility but phase out gradually
     schema.xp = new fields.SchemaField({
       value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
       progress: new fields.NumberField({
@@ -91,8 +116,34 @@ export default class Knave2eCharacter extends Knave2eActorType {
         max: 100,
       }),
     });
+    
+    // Essence tags for spellcasting
+    schema.essences = new fields.StringField({ initial: "" });
+    
     return schema;
   }
 
   prepareBaseData() {}
+  
+  prepareDerivedData() {
+    super.prepareDerivedData();
+    
+    // Calculate stamina max based on empty inventory slots
+    // Max stamina equals max slots minus used slots
+    const emptySlots = Math.max(0, this.slots.max - this.slots.value);
+    this.stamina.max = Math.floor(emptySlots);
+    
+    // Ensure stamina value doesn't exceed max
+    if (this.stamina.value > this.stamina.max) {
+      this.stamina.value = this.stamina.max;
+    }
+    
+    // Calculate stamina progress percentage
+    this.stamina.progress = this.stamina.max > 0 
+      ? Math.floor((this.stamina.value / this.stamina.max) * 100)
+      : 0;
+    
+    // Calculate XP ticks progress (for display)
+    this.xpTicks.progress = this.xpTicks.ticks * 10;
+  }
 }

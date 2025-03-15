@@ -7,6 +7,7 @@ import * as LIGHTSOURCE from "./light-source.mjs"
 import * as RECRUIT from "./recruit.mjs"
 import * as SPELLBOOK from "./spellbook.mjs"
 import * as WEAPON from "./weapon.mjs"
+import * as SPELL from "./spell.mjs"
 
 export const SYSTEM_ID = "knave2e"
 
@@ -30,5 +31,6 @@ export const SYSTEM = {
     LIGHTSOURCE,
     RECRUIT,
     SPELLBOOK,
-    WEAPON
+    WEAPON,
+    SPELL
 }

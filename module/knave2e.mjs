@@ -25,6 +25,8 @@ Hooks.on("init", () => {
   CONFIG.Item.dataModels.equipment = DataModels.Knave2eEquipment;
   CONFIG.Item.dataModels.armor = DataModels.Knave2eArmor;
   CONFIG.Item.dataModels.monsterAttack = DataModels.Knave2eMonsterAttack;
+  // Register the new spell item data model
+  CONFIG.Item.dataModels.spell = DataModels.Knave2eSpell;
 });
 
 Hooks.once("init", () => {
@@ -41,6 +43,8 @@ Hooks.once("i18nInit", function () {
     "EQUIPMENT",
     "SPELLBOOK",
     "WEAPON",
+    // Add the new SPELL category for localization
+    "SPELL"
   ];
   for (let c of toLocalize) {
     const conf = foundry.utils.getProperty(SYSTEM, c);
@@ -104,7 +108,7 @@ Hooks.once("init", function () {
     scope: "world",
     config: true,
     type: Boolean,
-    default: true,
+    default: false, // Changed to false as per requirements
     requiresReload: true,
   });
 
@@ -156,6 +160,17 @@ Hooks.once("init", function () {
   game.settings.register("knave2e", "automaticWounds", {
     name: "Automate Wounds",
     hint: "Derive maximum wounds from 10 + CON. Defaults to TRUE.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    requiresReload: true,
+  });
+
+  // Automatic Stamina
+  game.settings.register("knave2e", "automaticStamina", {
+    name: "Automate Stamina",
+    hint: "Derive maximum stamina from remaining inventory slots. Defaults to TRUE.",
     scope: "world",
     config: true,
     type: Boolean,
@@ -251,6 +266,17 @@ Hooks.once("init", function () {
     requiresReload: true,
   });
 
+  // Enforce Stamina Costs
+  game.settings.register("knave2e", "enforceStamina", {
+    name: "Enforce Stamina Costs",
+    hint: "Spells require stamina to cast, and casting fails if the character doesn't have enough stamina. Defaults to True.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    requiresReload: true,
+  });
+
   // XP to Level 2
   game.settings.register("knave2e", "baseLevelXP", {
     name: "Override XP to Level 2",
@@ -338,6 +364,15 @@ Handlebars.registerHelper("concat", function () {
 
 Handlebars.registerHelper("toLowerCase", function (str) {
   return str.toLowerCase();
+});
+
+// Add helper for XP ticks display
+Handlebars.registerHelper("xpTickRange", function(count) {
+  let result = [];
+  for (let i = 0; i < count; i++) {
+    result.push(i);
+  }
+  return result;
 });
 
 /* -------------------------------------------- */

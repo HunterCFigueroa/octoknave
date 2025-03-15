@@ -65,6 +65,11 @@ export default class Knave2eActorSheet extends ActorSheet {
         context.system.settings[filteredKey] = filteredValue;
       }
     }
+    
+    // If this is a character, filter items for the spell tab
+    if (actorData.type === "character") {
+      context.spells = context.items.filter(item => item.type === "spell");
+    }
 
     return context;
   }
@@ -96,6 +101,23 @@ export default class Knave2eActorSheet extends ActorSheet {
     const { hitPointsProgress, woundsProgress } = this._updateHealth(context);
     systemData.hitPoints.progress = hitPointsProgress;
     systemData.wounds.progress = woundsProgress;
+    
+    // Handle Stamina
+    if (game.settings.get("knave2e", "automaticStamina")) {
+      const { staminaMax, staminaProgress } = this._updateStamina(context);
+      systemData.stamina.max = staminaMax;
+      systemData.stamina.progress = staminaProgress;
+      
+      // Ensure stamina value doesn't exceed max
+      if (systemData.stamina.value > systemData.stamina.max) {
+        systemData.stamina.value = systemData.stamina.max;
+      }
+    } else {
+      // Just calculate the progress
+      systemData.stamina.progress = Math.floor(
+        (systemData.stamina.value / systemData.stamina.max) * 100
+      );
+    }
 
     // Handle Level/XP
     if (game.settings.get("knave2e", "automaticLevel")) {
@@ -326,6 +348,21 @@ export default class Knave2eActorSheet extends ActorSheet {
       return { hitPointsProgress, woundsProgress };
     }
   }
+  
+  _updateStamina(context) {
+    const systemData = context.system;
+    
+    // Calculate stamina max based on empty inventory slots
+    const emptySlots = Math.max(0, systemData.slots.max - systemData.slots.value);
+    const staminaMax = Math.floor(emptySlots);
+    
+    // Calculate stamina progress percentage
+    const staminaProgress = staminaMax > 0 
+      ? Math.floor((systemData.stamina.value / staminaMax) * 100)
+      : 0;
+      
+    return { staminaMax, staminaProgress };
+  }
 
   _updateBlessings(context) {
     const activeBlessings = context.items.filter(
@@ -475,6 +512,12 @@ export default class Knave2eActorSheet extends ActorSheet {
 
     // Toggle Item Icons
     html.on("click", ".item-toggle", this._onItemToggle.bind(this));
+    
+    // XP Ticks
+    html.on("click", ".xp-tick", this._onXpTick.bind(this));
+    
+    // Cast Spell
+    html.on("click", ".cast-spell", this._onCastSpell.bind(this));
 
     /* -------------------------------------------- */
     /*  Item Rolls                                  */
@@ -521,6 +564,118 @@ export default class Knave2eActorSheet extends ActorSheet {
 
     // // Recruit Rarity
     // html.on('change', '.actor-select.rarity', this._onRecruitRarity.bind(this));
+  }
+  
+  _onXpTick(event) {
+    event.preventDefault();
+    const tick = event.currentTarget;
+    const tickId = Number(tick.dataset.tickId);
+    const currentTicks = this.actor.system.xpTicks.ticks;
+    
+    // Toggle the tick on/off - clicking a tick sets all ticks up to that point
+    let newValue = tickId + 1;
+    
+    // If clicking the last active tick, reduce by one
+    if (currentTicks === newValue) {
+      newValue = tickId;
+    }
+    
+    // Update the actor
+    this.actor.update({
+      "system.xpTicks.ticks": newValue
+    });
+  }
+  
+  _onCastSpell(event) {
+    event.preventDefault();
+    const a = event.currentTarget;
+    const li = a.closest("li");
+    const item = this.actor.items.get(li.dataset.itemId);
+    
+    // Show casting dialog with stamina cost info
+    const baseStaminaCost = item.system.staminaCost;
+    const staminaAvailable = this.actor.system.stamina.value;
+    
+    // Check if we have enough stamina first
+    if (game.settings.get("knave2e", "enforceStamina") && staminaAvailable < baseStaminaCost) {
+      Dialog.prompt({
+        title: game.i18n.localize("KNAVE2E.NotEnoughStamina"),
+        content: `<p>${this.actor.name} ${game.i18n.localize("KNAVE2E.NotEnoughStaminaContent")} (${staminaAvailable}/${baseStaminaCost}).</p>`,
+        label: "OK",
+        callback: () => {}
+      });
+      return;
+    }
+    
+    new Dialog({
+      title: `${game.i18n.localize("KNAVE2E.CastingSpell")}: ${item.name}`,
+      content: `
+        <div class="cast-dialog">
+          <p>${game.i18n.localize("KNAVE2E.CastingSpellDetail")}</p>
+          <div class="stamina-adjust">
+            <label>${game.i18n.localize("KNAVE2E.BaseStaminaCost")}: ${baseStaminaCost}</label>
+          </div>
+          <div class="stamina-adjust">
+            <label>${game.i18n.localize("KNAVE2E.AdditionalStaminaCost")}:</label>
+            <input type="number" id="additional-stamina" value="0" min="0" max="${staminaAvailable - baseStaminaCost}">
+          </div>
+          <div class="stamina-adjust">
+            <label>${game.i18n.localize("KNAVE2E.TotalStaminaCost")}:</label>
+            <span id="total-stamina">${baseStaminaCost}</span>
+          </div>
+        </div>
+      `,
+      buttons: {
+        cast: {
+          icon: '<i class="fas fa-magic"></i>',
+          label: game.i18n.localize("KNAVE2E.Cast"),
+          callback: (html) => {
+            const additionalStamina = Number(html.find('#additional-stamina').val()) || 0;
+            const totalStamina = baseStaminaCost + additionalStamina;
+            
+            // Spend stamina
+            this.actor.update({
+              "system.stamina.value": staminaAvailable - totalStamina
+            });
+            
+            // Mark the spell as cast
+            item.update({
+              "system.isCast": true
+            });
+            
+            // Send a chat message for the spell casting
+            ChatMessage.create({
+              speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+              content: `
+                <div class="spell-cast-message">
+                  <h3>${this.actor.name} ${game.i18n.localize("KNAVE2E.CastsSpell")} ${item.name}</h3>
+                  <div><strong>${game.i18n.localize("KNAVE2E.StaminaSpent")}:</strong> ${totalStamina}</div>
+                  <div><strong>${game.i18n.localize("KNAVE2E.Essence")}:</strong> ${item.system.essence}</div>
+                  <div><strong>${game.i18n.localize("KNAVE2E.Tier")}:</strong> ${item.system.tier}</div>
+                  <hr>
+                  <div>${item.system.description}</div>
+                </div>
+              `,
+              rollMode: game.settings.get("core", "rollMode")
+            });
+          }
+        },
+        cancel: {
+          icon: '<i class="fas fa-times"></i>',
+          label: game.i18n.localize("KNAVE2E.Cancel")
+        }
+      },
+      render: (html) => {
+        // Update total stamina cost when additional cost changes
+        const additionalInput = html.find('#additional-stamina');
+        const totalDisplay = html.find('#total-stamina');
+        
+        additionalInput.on('change', (ev) => {
+          const additionalValue = Number(ev.target.value) || 0;
+          totalDisplay.text(baseStaminaCost + additionalValue);
+        });
+      }
+    }).render(true);
   }
 
   async _onItemName(event) {
@@ -727,8 +882,12 @@ export default class Knave2eActorSheet extends ActorSheet {
     event.preventDefault();
 
     let itemType;
-
-    if (this.actor.type === "monster") {
+    const element = event.currentTarget;
+    
+    // Check if a specific item type was specified in the data attribute
+    if (element.dataset.type === "spell") {
+      itemType = "spell";
+    } else if (this.actor.type === "monster") {
       itemType = "monsterAttack";
     } else {
       // Get the type of item to create.
@@ -764,6 +923,12 @@ export default class Knave2eActorSheet extends ActorSheet {
             label: game.i18n.localize("KNAVE2E.Weapon"),
             callback: () => {
               return "weapon";
+            },
+          },
+          spell: {
+            label: game.i18n.localize("KNAVE2E.Spell"),
+            callback: () => {
+              return "spell";
             },
           },
         },
@@ -822,6 +987,12 @@ export default class Knave2eActorSheet extends ActorSheet {
       .filter((i) => i.type === "spellbook")
       .map((i) => ({ _id: i.id, "system.cast": false }));
     this.actor.updateEmbeddedDocuments("Item", spellbookChanges);
+    
+    // Reset spell castings
+    let spellChanges = this.actor.items
+      .filter((i) => i.type === "spell")
+      .map((i) => ({ _id: i.id, "system.isCast": false }));
+    this.actor.updateEmbeddedDocuments("Item", spellChanges);
 
     // Recruits have no wounds to recover
     if (this.actor.type === "recruit") {
@@ -855,6 +1026,7 @@ export default class Knave2eActorSheet extends ActorSheet {
         return this.actor.update({
           "system.hitPoints.value": systemData.hitPoints.max,
           "system.spells.value": 0,
+          "system.stamina.value": systemData.stamina.max  // Restore stamina on rest
         });
       } else if (restType === "safe") {
         return this.actor.update({
@@ -864,6 +1036,7 @@ export default class Knave2eActorSheet extends ActorSheet {
             systemData.wounds.max
           ),
           "system.spells.value": 0,
+          "system.stamina.value": systemData.stamina.max  // Restore stamina on rest
         });
       }
     }

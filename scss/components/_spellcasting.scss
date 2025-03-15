@@ -1,0 +1,61 @@
+.xp-ticks-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin: 5px;
+  }
+  
+  .xp-tick {
+    margin: 0 2px;
+    cursor: pointer;
+    
+    i {
+      color: #999;
+    }
+    
+    &.active i {
+      color: #f0a30a;
+    }
+  }
+  
+  .progress-fill.stamina {
+    background-color: #9932cc;
+  }
+  
+  .cast-spell {
+    cursor: pointer;
+    
+    i {
+      color: #7d26cd;
+    }
+    
+    &:hover i {
+      color: #9932cc;
+    }
+  }
+  
+  .knave-item.cast {
+    background-color: rgba(153, 50, 204, 0.2);
+  }
+  
+  .cast-dialog {
+    min-height: 120px;
+    
+    .stamina-adjust {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+      
+      label {
+        flex: 3;
+      }
+      
+      input {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  }
