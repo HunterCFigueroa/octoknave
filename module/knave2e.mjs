@@ -25,6 +25,7 @@ Hooks.on("init", () => {
   CONFIG.Item.dataModels.equipment = DataModels.Knave2eEquipment;
   CONFIG.Item.dataModels.armor = DataModels.Knave2eArmor;
   CONFIG.Item.dataModels.monsterAttack = DataModels.Knave2eMonsterAttack;
+  CONFIG.Item.dataModels.spell = DataModels.Knave2eSpell; // Add this line
 });
 
 Hooks.once("init", () => {

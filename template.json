@@ -6,11 +6,12 @@
     "monster": {}
   },
   "Item": {
-    "types": ["armor", "equipment", "lightSource", "spellbook", "weapon", "monsterAttack"],
+    "types": ["armor", "equipment", "lightSource", "spell", "spellbook", "weapon", "monsterAttack"],
     "armor": {},
     "equipment": {},
     "lightSource": {},
     "monsterAttack": {},
+    "spell": {},
     "spellbook": {},
     "weapon": {}
   }

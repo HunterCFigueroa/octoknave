@@ -782,6 +782,12 @@ export default class Knave2eActorSheet extends ActorSheet {
               return "lightSource";
             },
           },
+          spell: {
+            label: game.i18n.localize("KNAVE2E.Spell"),
+            callback: () => {
+              return "spell";
+            },
+          },
           spellbook: {
             label: game.i18n.localize("KNAVE2E.Spellbook"),
             callback: () => {

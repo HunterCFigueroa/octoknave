@@ -202,5 +202,11 @@
   "TYPES.Item.weapon": "Weapon",
 
   "KNAVE2E.Stamina": "Stamina",
-  "KNAVE2E.StaminaMax": "Max Stm"
+  "KNAVE2E.StaminaMax": "Max Stm",
+  "KNAVE2E.Spell": "Spell",
+  "KNAVE2E.Tier": "Tier",
+  "KNAVE2E.Proficiency": "Proficiency",
+  "KNAVE2E.Essence": "Essence",
+  "KNAVE2E.StaminaCost": "Stamina Cost",
+  "KNAVE2E.SpellXP": "Spell XP"
 }

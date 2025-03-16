@@ -63,6 +63,10 @@ export default class Knave2eItemSheet extends ItemSheet {
       this._prepareMonsterAttackData(context);
     }
 
+    if (itemData.type == "spell") {
+      this._prepareSpellData(context);
+    }
+
     context.system.enrichedHTML = await TextEditor.enrichHTML(
       context.system.description
     );
@@ -127,5 +131,35 @@ export default class Knave2eItemSheet extends ItemSheet {
 
     // Everything below here is only needed if the sheet is editable
     if (!this.isEditable) return;
+
+    if (this.item.type === "spell") {
+      html.on("click", ".xp-tick", this._onXpTickClick.bind(this));
+    }
   }
+
+
+_prepareSpellData(context) {
+  return context;
+}
+
+/**
+ * Handle clicking on an XP tick for spells
+ * @param {Event} event The originating click event
+ * @private
+ */
+async _onXpTickClick(event) {
+  event.preventDefault();
+  const tick = event.currentTarget;
+  const clickedTick = parseInt(tick.dataset.xpTick);
+
+  const currentTicks = this.item.system.xpTicks;
+
+  const newTicks =
+    clickedTick === currentTicks ? clickedTick - 1 : clickedTick;
+
+  // Update the item
+  await this.item.update({
+    "system.xpTicks": newTicks,
+  });
+}
 }
