@@ -36,6 +36,14 @@ export default class Knave2eActorSheet extends ActorSheet {
 
     // Prepare character data and items.
     if (actorData.type == "character") {
+      const allItems = actorData.items || [];
+
+      const spells = allItems.filter((item) => item.type === "spell");
+      const otherItems = allItems.filter((item) => item.type !== "spell");
+
+      context.items = otherItems;
+      context.spells = spells;
+
       this._prepareCharacterData(context);
     }
 
@@ -461,6 +469,10 @@ export default class Knave2eActorSheet extends ActorSheet {
   activateListeners(html) {
     super.activateListeners(html);
 
+    html.find(".item-create-spell").click(this._onSpellCreate.bind(this));
+
+    html.find(".item-button.cast-spell").click(this._onCastSpell.bind(this));
+
     // Render the item sheet for viewing/editing prior to the editable check.
     html.find(".item-edit").click((ev) => {
       const li = $(ev.currentTarget).parents(".knave-item");
@@ -549,6 +561,108 @@ export default class Knave2eActorSheet extends ActorSheet {
 
     // // Recruit Rarity
     // html.on('change', '.actor-select.rarity', this._onRecruitRarity.bind(this));
+  }
+
+  async _onSpellCreate(event) {
+    event.preventDefault();
+
+    // Initialize a default name
+    const name = "New Spell";
+
+    // Prepare the item object
+    const itemData = {
+      name: name,
+      type: "spell",
+      system: {
+        slots: 0,
+        staminaCost: 1,
+      },
+    };
+
+    return await Item.create(itemData, { parent: this.actor });
+  }
+
+  async _onCastSpell(event) {
+    event.preventDefault();
+    const a = event.currentTarget;
+    const systemData = this.actor.system;
+
+    const li = a.closest("li");
+    const item = li.dataset.itemId
+      ? this.actor.items.get(li.dataset.itemId)
+      : null;
+
+    if (!item) return;
+
+    const baseStaminaCost = item.system.staminaCost || 1;
+
+    if (systemData.stamina.value < baseStaminaCost) {
+      return ui.notifications.warn(`Not enough stamina to cast ${item.name}!`);
+    }
+
+    const dialogContent = `
+      <form>
+        <div class="form-group">
+          <label>Stamina Cost: </label>
+          <input type="number" name="staminaCost" value="${baseStaminaCost}" min="1">
+        </div>
+        <div class="form-group">
+          <label>Add Effect: </label>
+          <input type="text" name="additionalEffect" value="">
+        </div>
+      </form>
+    `;
+
+    new Dialog({
+      title: `Cast ${item.name}`,
+      content: dialogContent,
+      buttons: {
+        cast: {
+          icon: '<i class="fas fa-magic"></i>',
+          label: "Cast",
+          callback: (html) => {
+            const form = html.find("form")[0];
+            const staminaCost = Math.max(
+              1,
+              parseInt(form.staminaCost.value) || baseStaminaCost
+            );
+            const additionalEffect = form.additionalEffect.value;
+
+            if (systemData.stamina.value < staminaCost) {
+              return ui.notifications.error(
+                `Not enough stamina to cast ${item.name}!`
+              );
+            }
+
+            this.actor.update({
+              "system.stamina.value": Math.max(
+                0,
+                systemData.stamina.value - staminaCost
+              ),
+            });
+
+            let content = `<h3>${item.name}</h3>`;
+            content += `<p><strong>Stamina Cost:</strong> ${staminaCost}</p>`;
+            content += `<p>${item.system.description || ""}</p>`;
+
+            if (additionalEffect) {
+              content += `<p><strong>Additional Effect:</strong> ${additionalEffect}</p>`;
+            }
+
+            ChatMessage.create({
+              speaker: ChatMessage.getSpeaker({ actor: this.actor }),
+              flavor: `${this.actor.name} casts a spell!`,
+              content: content,
+            });
+          },
+        },
+        cancel: {
+          icon: '<i class="fas fa-times"></i>',
+          label: "Cancel",
+        },
+      },
+      default: "cast",
+    }).render(true);
   }
 
   async _onItemName(event) {

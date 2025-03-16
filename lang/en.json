@@ -208,5 +208,12 @@
   "KNAVE2E.Proficiency": "Proficiency",
   "KNAVE2E.Essence": "Essence",
   "KNAVE2E.StaminaCost": "Stamina Cost",
-  "KNAVE2E.SpellXP": "Spell XP"
+  "KNAVE2E.SpellXP": "Spell XP",
+  "KNAVE2E.Spellcasting": "Spellcasting",
+  "KNAVE2E.CastSpell": "Cast Spell",
+  "KNAVE2E.SpellcastingTab": "Spellcasting",
+  "KNAVE2E.AdditionalEffect": "Additional Effect",
+  "KNAVE2E.SpellcastingDialogTitle": "Cast Spell",
+  "KNAVE2E.NotEnoughStamina": "Not enough stamina!",
+  "KNAVE2E.AdjustStaminaCost": "Adjust Stamina Cost"
 }
