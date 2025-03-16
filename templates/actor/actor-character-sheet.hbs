@@ -101,12 +101,14 @@
                     {{!-- Health --}}
                     <div class="health flexcol no-wrap">
                         <div class="health-max">
-                            <div class="grid grid-3col" style="justify-items:center">
+                            <div class="grid {{#if system.settings.displayWounds}}grid-3col{{else}}grid-2col{{/if}}" style="justify-items:center">
                                 <div class="grid-span-1 flexcol no-wrap flex-group-center">
                                     <div class="resource-label">{{localize "KNAVE2E.HitPointsMax"}}</div>
                                     <input class="resource-label content transparent rounded character"
                                         name="system.hitPoints.max" value="{{system.hitPoints.max}}" />
                                 </div>
+                                
+                                {{#if system.settings.displayWounds}}
                                 <div class="grid-span-1 flexcol no-wrap flex-group-center">
                                     <div class="resource-label">{{localize "KNAVE2E.WoundsMax"}}</div>
                                     {{#if system.settings.automaticWounds}}
@@ -116,14 +118,17 @@
                                         name="system.wounds.max" value="{{system.wounds.max}}" data-dtype="Number" />
                                     {{/if}}
                                 </div>
+                                {{/if}}
+                                
                                 <div class="grid-span-1 flexcol no-wrap flex-group-center">
                                     <div class="resource-label">{{localize "KNAVE2E.StaminaMax"}}</div>
                                     <div class="resource-label rounded character">{{system.stamina.max}}</div>
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="health-value">
-                            <div class="grid grid-3col" style="justify-items:center">
+                            <div class="grid {{#if system.settings.displayWounds}}grid-3col{{else}}grid-2col{{/if}}" style="justify-items:center">
                                 <div class="progress-container grid-span-1 vertical">
                                     <div class="progress-bar">
                                         <div class="progress-fill hitPoints" style="height:{{system.hitPoints.progress}}%">
@@ -132,6 +137,8 @@
                                             value="{{system.hitPoints.value}}" />
                                     </div>
                                 </div>
+                                
+                                {{#if system.settings.displayWounds}}
                                 <div class="progress-container grid-span-1 vertical">
                                     <div class="progress-bar">
                                         <div class="progress-fill wounds" style="height:{{system.wounds.progress}}%">
@@ -140,6 +147,8 @@
                                             value="{{system.wounds.value}}" />
                                     </div>
                                 </div>
+                                {{/if}}
+                                
                                 <div class="progress-container grid-span-1 vertical">
                                     <div class="progress-bar">
                                         <div class="progress-fill stamina" style="height:{{system.stamina.progress}}%">
@@ -150,10 +159,11 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="health-rest">
-                            <button class="resource-label rounded transparent actor-button rest"
-                                type="button">{{localize
-                                "KNAVE2E.Rest"}}</button>
+                            <button class="resource-label rounded transparent actor-button rest" type="button">
+                                {{localize "KNAVE2E.Rest"}}
+                            </button>
                         </div>
                     </div>
 

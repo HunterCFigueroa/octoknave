@@ -294,6 +294,16 @@ Hooks.once("init", function () {
     requiresReload: true,
   });
 
+  game.settings.register("knave2e", "displayWounds", {
+    name: "Display Wounds System",
+    hint: "Show the wounds system on character sheets. Set to FALSE to hide the wounds system. Defaults to TRUE.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    requiresReload: true,
+  });
+
   // Coins Per Slot
   game.settings.register("knave2e", "coinsPerSlot", {
     name: "Override Coins Per Slot",
