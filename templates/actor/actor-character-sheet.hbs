@@ -101,7 +101,7 @@
                     {{!-- Health --}}
                     <div class="health flexcol no-wrap">
                         <div class="health-max">
-                            <div class="grid grid-2col" style="justify-items:center">
+                            <div class="grid grid-3col" style="justify-items:center">
                                 <div class="grid-span-1 flexcol no-wrap flex-group-center">
                                     <div class="resource-label">{{localize "KNAVE2E.HitPointsMax"}}</div>
                                     <input class="resource-label content transparent rounded character"
@@ -116,17 +116,20 @@
                                         name="system.wounds.max" value="{{system.wounds.max}}" data-dtype="Number" />
                                     {{/if}}
                                 </div>
+                                <div class="grid-span-1 flexcol no-wrap flex-group-center">
+                                    <div class="resource-label">{{localize "KNAVE2E.StaminaMax"}}</div>
+                                    <div class="resource-label rounded character">{{system.stamina.max}}</div>
+                                </div>
                             </div>
                         </div>
                         <div class="health-value">
-                            <div class="grid grid-2col" style="justify-items:center">
+                            <div class="grid grid-3col" style="justify-items:center">
                                 <div class="progress-container grid-span-1 vertical">
                                     <div class="progress-bar">
-                                        <div class="progress-fill hitPoints"
-                                            style="height:{{system.hitPoints.progress}}%">
+                                        <div class="progress-fill hitPoints" style="height:{{system.hitPoints.progress}}%">
                                         </div>
-                                        <input class="progress-input resource-label content"
-                                            name="system.hitPoints.value" value="{{system.hitPoints.value}}" />
+                                        <input class="progress-input resource-label content" name="system.hitPoints.value"
+                                            value="{{system.hitPoints.value}}" />
                                     </div>
                                 </div>
                                 <div class="progress-container grid-span-1 vertical">
@@ -135,6 +138,14 @@
                                         </div>
                                         <input class="progress-input resource-label content" name="system.wounds.value"
                                             value="{{system.wounds.value}}" />
+                                    </div>
+                                </div>
+                                <div class="progress-container grid-span-1 vertical">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill stamina" style="height:{{system.stamina.progress}}%">
+                                        </div>
+                                        <input class="progress-input resource-label content" name="system.stamina.value"
+                                            value="{{system.stamina.value}}" />
                                     </div>
                                 </div>
                             </div>

@@ -129,6 +129,38 @@ export default class Knave2eActorSheet extends ActorSheet {
       systemData.slots.value = Number(systemData.slots.value.toPrecision(2));
       systemData.slots.max = Number(systemData.slots.max.toPrecision(2));
     }
+
+    // Handle Stamina (based on empty slots)
+    if (game.settings.get("knave2e", "automaticStamina") && game.settings.get("knave2e", "automaticSlots")) {
+      const emptySlots = Math.max(
+        0,
+        systemData.slots.max - systemData.slots.value
+      );
+      systemData.stamina.max = Math.floor(emptySlots);
+
+      systemData.stamina.value = Math.min(
+        systemData.stamina.value,
+        systemData.stamina.max
+      );
+
+      const staminaProgress =
+        systemData.stamina.max === 0
+          ? 0
+          : Math.floor(
+              (systemData.stamina.value / systemData.stamina.max) * 100
+            );
+      systemData.stamina.progress = staminaProgress;
+    } else {
+      systemData.stamina.progress = Math.floor(
+        (systemData.stamina.value / systemData.stamina.max) * 100
+      );
+    }
+
+    // Always cap stamina value at its max
+    systemData.stamina.value = Math.min(
+      systemData.stamina.value,
+      systemData.stamina.max
+    );
   }
 
   _prepareRecruitData(context) {

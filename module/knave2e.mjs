@@ -284,6 +284,16 @@ Hooks.once("init", function () {
     requiresReload: true,
   });
 
+  game.settings.register("knave2e", "automaticStamina", {
+    name: "Automate Stamina",
+    hint: "Derive maximum stamina from empty inventory slots. Defaults to TRUE.",
+    scope: "world",
+    config: true,
+    type: Boolean,
+    default: true,
+    requiresReload: true,
+  });
+
   // Coins Per Slot
   game.settings.register("knave2e", "coinsPerSlot", {
     name: "Override Coins Per Slot",

@@ -91,6 +91,22 @@ export default class Knave2eCharacter extends Knave2eActorType {
         max: 100,
       }),
     });
+
+    // Add stamina schema
+    schema.stamina = new fields.SchemaField({
+      value: new fields.NumberField({
+        ...requiredInteger,
+        initial: 10,
+        min: 0,
+      }),
+      max: new fields.NumberField({ ...requiredInteger, initial: 10, min: 0 }),
+      progress: new fields.NumberField({
+        ...requiredInteger,
+        initial: 100,
+        min: 0,
+      }),
+    });
+
     return schema;
   }
 
