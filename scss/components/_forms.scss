@@ -100,3 +100,47 @@ footer {
     min-height: 200px;
   }
 }
+
+
+.xp-ticks-container {
+  width: 100%;
+  margin-left: 5px;
+}
+
+.xp-ticks {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 2px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid black;
+  border-radius: 5px;
+  padding: 0 5px;
+}
+
+.xp-tick {
+  height: 16px;
+  width: 16px;
+  margin: auto 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #666;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.5);
+  color: transparent;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.xp-tick:hover {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.xp-tick.ticked {
+  background: #7cd000;
+  color: white;
+}
+
+

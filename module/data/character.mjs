@@ -82,14 +82,21 @@ export default class Knave2eCharacter extends Knave2eActorType {
         min: 0,
       }),
     });
+    
+    // Modified XP schema to store which ticks are marked
     schema.xp = new fields.SchemaField({
-      value: new fields.NumberField({ ...requiredInteger, initial: 0, min: 0 }),
-      progress: new fields.NumberField({
-        ...requiredInteger,
-        initial: 0,
-        min: 0,
-        max: 100,
+      ticks: new fields.NumberField({ 
+        ...requiredInteger, 
+        initial: 0, 
+        min: 0, 
+        max: 10
       }),
+      // We'll keep the value field for compatibility, but it won't be used for calculation
+      value: new fields.NumberField({ 
+        ...requiredInteger, 
+        initial: 0, 
+        min: 0 
+      })
     });
 
     // Add stamina schema

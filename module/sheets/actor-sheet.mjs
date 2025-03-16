@@ -97,16 +97,8 @@ export default class Knave2eActorSheet extends ActorSheet {
     systemData.hitPoints.progress = hitPointsProgress;
     systemData.wounds.progress = woundsProgress;
 
-    // Handle Level/XP
-    if (game.settings.get("knave2e", "automaticLevel")) {
-      const { currentLevel, progress } = this._updateLevelAndXP(
-        systemData.xp.value
-      );
-      systemData.level = currentLevel;
-      systemData.xp.progress = progress;
-    } else {
-      systemData.xp.progress = 0;
-    }
+    // REMOVED automatic Level/XP calculation
+    // No longer using _updateLevelAndXP
 
     // Handle Light
     if (game.settings.get("knave2e", "automaticLight")) {
@@ -129,9 +121,11 @@ export default class Knave2eActorSheet extends ActorSheet {
       systemData.slots.value = Number(systemData.slots.value.toPrecision(2));
       systemData.slots.max = Number(systemData.slots.max.toPrecision(2));
     }
-
     // Handle Stamina (based on empty slots)
-    if (game.settings.get("knave2e", "automaticStamina") && game.settings.get("knave2e", "automaticSlots")) {
+    if (
+      game.settings.get("knave2e", "automaticStamina") &&
+      game.settings.get("knave2e", "automaticSlots")
+    ) {
       const emptySlots = Math.max(
         0,
         systemData.slots.max - systemData.slots.value
@@ -544,6 +538,8 @@ export default class Knave2eActorSheet extends ActorSheet {
       this._onNumberAppearing.bind(this)
     );
 
+    html.on("click", ".xp-tick", this._onXpTickClick.bind(this));
+
     /* -------------------------------------------- */
     /*  Sheet Dropdown                              */
     /* -------------------------------------------- */
@@ -931,6 +927,27 @@ export default class Knave2eActorSheet extends ActorSheet {
 
       return r;
     }
+  }
+
+  /**
+   * Handle clicking on an XP tick
+   * @param {Event} event The originating click event
+   * @private
+   */
+  async _onXpTickClick(event) {
+    event.preventDefault();
+    const tick = event.currentTarget;
+    const clickedTick = parseInt(tick.dataset.xpTick);
+
+    const currentTicks = this.actor.system.xp.ticks;
+
+    const newTicks =
+      clickedTick === currentTicks ? clickedTick - 1 : clickedTick;
+
+    // Update the actor
+    await this.actor.update({
+      "system.xp.ticks": newTicks,
+    });
   }
 
   _updateLevelAndXP(xp) {

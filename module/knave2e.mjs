@@ -360,6 +360,18 @@ Handlebars.registerHelper("toLowerCase", function (str) {
   return str.toLowerCase();
 });
 
+Handlebars.registerHelper('range', function(start, end) {
+  const result = [];
+  for (let i = start; i < end; i++) {
+    result.push(i);
+  }
+  return result;
+});
+
+Handlebars.registerHelper('lte', function(a, b) {
+  return a <= b;
+});
+
 /* -------------------------------------------- */
 /*  Ready Hook                                  */
 /* -------------------------------------------- */

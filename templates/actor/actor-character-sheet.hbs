@@ -168,23 +168,24 @@
                     </div>
 
                     {{!-- Advancement --}}
-                    <div class="level flexrow no-wrap">
+                   <div class="level flexrow no-wrap">
                         <div class="flexcol no-wrap flex-group-center">
                             <div class="resource-label">{{localize "KNAVE2E.Level"}}</div>
-                                    {{#if system.settings.automaticLevel}}
-                                    <div class="resource-label rounded character">{{system.level}}</div>
-                                    {{else}}
-                                    <input class="resource-label narrow content rounded character" type="text"
-                                        name="system.level" value="{{system.level}}" data-dtype="Number" />
-                                    {{/if}}
+                            {{!-- Level is now always manually set --}}
+                            <input class="resource-label narrow content rounded character" type="text"
+                                name="system.level" value="{{system.level}}" data-dtype="Number" />
                         </div>
                         <div class="xp flex-group-left">
                             <div class="resource-label">&nbsp;{{localize "KNAVE2E.XP"}}</div>
-                            <div class="progress-container horizontal">
-                                <div class="progress-bar">
-                                    <div class="progress-fill xp" style="width:{{system.xp.progress}}%"></div>
-                                    <input class="progress-input resource-label content" name="system.xp.value"
-                                        value="{{system.xp.value}}" />
+                            <div class="xp-ticks-container">
+                                {{!-- Create 10 tick boxes for XP --}}
+                                <div class="xp-ticks">
+                                    {{#each (range 1 11) as |tickNum|}}
+                                    <div class="xp-tick {{#if (lte tickNum ../system.xp.ticks)}}ticked{{/if}}" 
+                                        data-xp-tick="{{tickNum}}">
+                                        &#10003;
+                                    </div>
+                                    {{/each}}
                                 </div>
                             </div>
                         </div>
