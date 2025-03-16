@@ -47,7 +47,6 @@
                 {{!-- Default tab is specified in actor-sheet.mjs --}}
                 <a class="item tab-color resource-label" data-tab="character">{{localize "KNAVE2E.Character"}}</a>
                 <a class="item tab-color resource-label" data-tab="items">{{localize "KNAVE2E.Inventory"}}</a>
-                <a class="item tab-color resource-label" data-tab="spellcasting">{{localize "KNAVE2E.Spellcasting"}}</a>
                 <a class="item tab-color resource-label" data-tab="description">{{localize "KNAVE2E.Description"}}</a>
             </nav>
 
@@ -99,7 +98,7 @@
                         </div>
                     </div>
 
-                    {{!-- Health & Stamina --}}
+                    {{!-- Health --}}
                     <div class="health flexcol no-wrap">
                         <div class="health-max">
                             <div class="grid grid-2col" style="justify-items:center">
@@ -140,35 +139,6 @@
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- New stamina section -->
-                        <div class="stamina-max">
-                            <div class="grid grid-1col" style="justify-items:center">
-                                <div class="grid-span-1 flexcol no-wrap flex-group-center">
-                                    <div class="resource-label">{{localize "KNAVE2E.StaminaMax"}}</div>
-                                    {{#if system.settings.automaticStamina}}
-                                    <div class="resource-label rounded character">{{system.stamina.max}}</div>
-                                    {{else}}
-                                    <input class="resource-label narrow content rounded character" type="text"
-                                        name="system.stamina.max" value="{{system.stamina.max}}" data-dtype="Number" />
-                                    {{/if}}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="stamina-value">
-                            <div class="grid grid-1col" style="justify-items:center">
-                                <div class="progress-container grid-span-1 horizontal stamina">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill stamina"
-                                            style="width:{{system.stamina.progress}}%">
-                                        </div>
-                                        <input class="progress-input resource-label content"
-                                            name="system.stamina.value" value="{{system.stamina.value}}" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <div class="health-rest">
                             <button class="resource-label rounded transparent actor-button rest"
                                 type="button">{{localize
@@ -177,22 +147,24 @@
                     </div>
 
                     {{!-- Advancement --}}
-                    <div class="level flexcol no-wrap">
+                    <div class="level flexrow no-wrap">
                         <div class="flexcol no-wrap flex-group-center">
                             <div class="resource-label">{{localize "KNAVE2E.Level"}}</div>
-                            <input class="resource-label narrow content rounded character" type="text"
-                                name="system.level" value="{{system.level}}" data-dtype="Number" />
+                                    {{#if system.settings.automaticLevel}}
+                                    <div class="resource-label rounded character">{{system.level}}</div>
+                                    {{else}}
+                                    <input class="resource-label narrow content rounded character" type="text"
+                                        name="system.level" value="{{system.level}}" data-dtype="Number" />
+                                    {{/if}}
                         </div>
-                        
-                        <!-- XP ticks system -->
-                        <div class="xp-ticks flex-group-center">
-                            <div class="resource-label">{{localize "KNAVE2E.XPTicks"}}</div>
-                            <div class="xp-ticks-container">
-                                {{#each (xpTickRange 10)}}
-                                <a class="xp-tick {{#if (lt this ../system.xpTicks.ticks)}}active{{/if}}" data-tick-id="{{this}}">
-                                    <i class="fas fa-square"></i>
-                                </a>
-                                {{/each}}
+                        <div class="xp flex-group-left">
+                            <div class="resource-label">&nbsp;{{localize "KNAVE2E.XP"}}</div>
+                            <div class="progress-container horizontal">
+                                <div class="progress-bar">
+                                    <div class="progress-fill xp" style="width:{{system.xp.progress}}%"></div>
+                                    <input class="progress-input resource-label content" name="system.xp.value"
+                                        value="{{system.xp.value}}" />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,11 +182,6 @@
                 {{!-- Item Slots Tab --}}
                 <div class="tab items" data-group="primary" data-tab="items">
                     {{> "systems/octoknave/templates/actor/parts/actor-character-items.hbs"}}
-                </div>
-                
-                {{!-- Spellcasting Tab --}}
-                <div class="tab spellcasting" data-group="primary" data-tab="spellcasting">
-                    {{> "systems/octoknave/templates/actor/parts/actor-character-spells.hbs"}}
                 </div>
 
                 {{!-- Description Tab --}}
